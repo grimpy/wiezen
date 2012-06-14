@@ -1,0 +1,47 @@
+<html{>
+    <head>
+        <link rel=stylesheet type=text/css href="css/style.css">
+        <script type=text/javascript src="js/jquery-1.7.2.js"></script>
+        <script type=text/javascript src="js/wiezen.js"></script>
+        <title>Whist Scores</title>
+    </head>
+<body>
+    <div class="scores">
+        <table class="scorestbl">
+            <tr>
+                <th>Name</th>
+                <th>Score</th>
+            </tr>
+            <tr>
+                <td class="name">Player 1</td>
+                <td class="score">0</td>
+            </tr>
+            <tr>
+                <td class="name">Player 2</td>
+                <td class="score">0</td>
+            </tr>
+            <tr>
+                <td class="name">Player 3</td>
+                <td class="score">0</td>
+            </tr>
+            <tr>
+                <td class="name">Player 4</td>
+                <td class="score">0</td>
+            </tr>
+        </table>
+    </div>
+    <div class="games">
+        <input type="radio" value="alone" id="alone" name="game"/><label for="alone">Alone</label><br/>
+        <input type="radio" value="withtwo" id="withtwo" name="game"/><label for="withtwo">With two</label><br/>
+        <input type="radio" value="arbendance" id="arbendance" name="game"/><label for="arbendance">Arbendance</label><br/>
+        <input type="radio" value="trul" id="trul" name="game"/><label for="trul">Trul</label><br/>
+        <input type="radio" value="miserie" id="miserie" name="game"/><label for="miserie">Miserie</label><br/>
+        <input type="radio" value="miserietable" id="miserietable" name="game"/><label for="miserietable">Miserie on the table</label><br/>
+        <input type="radio" value="soloslim" id="soloslim" name="game"/><label for="soloslim">Soloslim</label><br/>
+    </div>
+    <div class="tricks">
+        <input type="checkbox" id="dbl"></input>
+        <input id="tricks"></input>
+    </div>
+</body>
+</html>

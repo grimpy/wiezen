@@ -1,0 +1,6 @@
+body            { font-family: sans-serif; background: #eee; }
+.green          { background: #0f0; }
+.games          { float: left; }
+.scores          { float: left; }
+.tricks          { clear:both; float: left; }
+.score          { text-align: right;
