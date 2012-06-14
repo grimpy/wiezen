@@ -64,17 +64,17 @@ var addScore = function() {
     var multiplier = isDouble() ? 2: 1;
     var basescore = game.getBaseScore(tricks, multiplier);
     var scores = $(".score");
-    var amount = $('.green').length;
+    var amount = $('.playing').length;
     if (! game.validate(amount)){
         alert("Invalid amount of players!");
         return false
     }
     //TODO: think of triplie miserie
-    var green = amount == 2 ? 1: 3;
+    var alone = amount == 2 ? 1: 3;
     $.each($('.name'), function(idx, val){
         var score = parseInt(scores[idx].innerText);
-        if($(val).hasClass('green')){
-            score += basescore * green;
+        if($(val).hasClass('playing')){
+            score += basescore * alone;
         }
         else{
             score -= basescore;
@@ -97,16 +97,17 @@ $(document).ready(function() {
         var gametype = getSelectedGame();
 
         $this = $(this)
-        $this.toggleClass("green");
+        $this.toggleClass("playing");
     } );
     $('#tricks').keydown(function (ev) {
-        if ((ev.keyCode >= 48 && ev.keyCode <= 57) || ev.keyCode == 8){
+        console.log(ev.keyCode);
+        if ((ev.keyCode >= 48 && ev.keyCode <= 57) || ev.keyCode == 8 || ev.keyCode == 9 || ev.keyCode == 17){
             return true;
         }
         if (ev.keyCode == 13){
             if (addScore()){
                 $("#tricks").val('');
-                $(".green").removeClass('green');
+                $(".playing").removeClass('playing');
                 $('#dbl').attr('checked', false);
             }
         }

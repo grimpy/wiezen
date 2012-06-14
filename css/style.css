@@ -1,6 +1,8 @@
 body            { font-family: sans-serif; background: #eee; }
-.green          { background: #0f0; }
+.playing        { color: #00f; }
 .games          { float: left; }
-.scores          { float: left; }
-.tricks          { clear:both; float: left; }
-.score          { text-align: right;
+.scores         { float: left; }
+.tricks         { clear:both; float: left; }
+input           { text-align: right; width: 50px;}
+.score          { text-align: right; }
+.name           { cursor: pointer; }
