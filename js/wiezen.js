@@ -1,3 +1,16 @@
+var graph = [[[0, 0]], [[0, 0]], [[0, 0]], [[0, 0]]];
+var getGraphOptions = function () {
+    var maxtick = graph[0].length;
+    var options = {axes: { xaxis: {min: 0, max: maxtick, numberTicks: maxtick+1}},
+                   legend: { show: true}};
+    var series = [];
+    $.each($('.name'), function(idx, val){
+        series.push({label: val.innerHTML});
+    });
+    options.series = series;
+    return options;
+};
+
 var getBaseScore = function(tricks, multiplier){
     if (! multiplier){
         multiplier = 1;
@@ -33,13 +46,13 @@ var validate = function(players){
 
 var plain = { players: [1], score: 2, multiplier: 1, getBaseScore: getBaseScore, validate: validate }
 
-var alone = $.extend({}, plain, {tricks: 5});
-var withtwo = $.extend({}, plain, {players: [2], tricks: 8});
-var arbendance = $.extend({}, plain, {tricks: 9, score: 5});
-var trul = $.extend({}, plain, {players: [2], tricks: 8, score: 3, multiplier: 2});
-var miserie = $.extend({}, plain, {players: [1,2,3,4], tricks: 0, score: 5, getBaseScore: getMiserieScore});
-var miserietable = $.extend({}, plain, {players: [1,2,3,4], tricks: 0, score: 20, getBaseScore: getMiserieScore});
-var soloslim = $.extend({}, plain, {players: [1], tricks: 13, score: 20});
+var alone = $.extend({}, plain, {tricks: 5, name: 'alone'});
+var withtwo = $.extend({}, plain, {players: [2], tricks: 8, name: 'withtwo'});
+var arbendance = $.extend({}, plain, {tricks: 9, score: 5, name: 'arbendance'});
+var trul = $.extend({}, plain, {players: [2], tricks: 8, score: 3, multiplier: 2, name: 'trul'});
+var miserie = $.extend({}, plain, {players: [1,2,3,4], tricks: 0, score: 5, name: 'miserie', getBaseScore: getMiserieScore});
+var miserietable = $.extend({}, plain, {players: [1,2,3,4], tricks: 0, score: 20, name: 'miserietable', getBaseScore: getMiserieScore});
+var soloslim = $.extend({}, plain, {players: [1], tricks: 13, score: 20, name: 'soloslim'});
 
 var games = {alone: alone, withtwo: withtwo,
              arbendance: arbendance, trul: trul,
@@ -58,6 +71,7 @@ var isDouble = function() {
     return $("#dbl").is(':checked')
 }
 
+
 var addScore = function() {
     var game = getSelectedGame();
     var tricks = getTricks();
@@ -72,15 +86,23 @@ var addScore = function() {
     //TODO: think of triplie miserie
     var alone = amount == 2 ? 1: 3;
     $.each($('.name'), function(idx, val){
-        var score = parseInt(scores[idx].innerText);
+        var score = parseInt(scores[idx].innerHTML);
         if($(val).hasClass('playing')){
             score += basescore * alone;
         }
         else{
             score -= basescore;
         }
-        scores[idx].innerText = score;
+        scores[idx].innerHTML = score;
+
+        graph[idx].push([graph[idx].length, score]);
     });
+    $("#charts").empty();
+    $("#charts").append($("<div id='chart'>"));
+    $.jqplot('chart', graph, getGraphOptions());
+    var t = +new Date();
+    var play = {ts: t, game: game, tricks: tricks}
+    localStorage.setItem('game.' + t, JSON.stringify(play));
     return true;
 
 };
@@ -90,7 +112,7 @@ $(document).ready(function() {
     //name change
     $('.name').dblclick(function() {
         var newname = prompt("Enter new name:")
-        this.innerText = newname;
+        this.innerHTML = newname;
     } );
     //player select
     $('.name').click(function() {
@@ -113,4 +135,6 @@ $(document).ready(function() {
         }
         return false;
     });
+
+    $.jqplot('chart', graph, getGraphOptions());
 });
