@@ -1,4 +1,6 @@
-var graph = [[[0, 0]], [[0, 0]], [[0, 0]], [[0, 0]]];
+var graph = null;
+var gameprogress = null;
+
 var getGraphOptions = function () {
     var maxtick = graph[0].length;
     var options = {axes: { xaxis: {min: 0, max: maxtick, numberTicks: maxtick+1}},
@@ -72,13 +74,11 @@ var isDouble = function() {
 }
 
 
-var addScore = function() {
-    var game = getSelectedGame();
-    var tricks = getTricks();
+var addScore = function(game, tricks, currentplayers) {
     var multiplier = isDouble() ? 2: 1;
     var basescore = game.getBaseScore(tricks, multiplier);
     var scores = $(".score");
-    var amount = $('.playing').length;
+    var amount = currentplayers.length;
     if (! game.validate(amount)){
         alert("Invalid amount of players!");
         return false
@@ -87,7 +87,7 @@ var addScore = function() {
     var alone = amount == 2 ? 1: 3;
     $.each($('.name'), function(idx, val){
         var score = parseInt(scores[idx].innerHTML);
-        if($(val).hasClass('playing')){
+        if(currentplayers.indexOf(idx) != -1){
             score += basescore * alone;
         }
         else{
@@ -97,45 +97,116 @@ var addScore = function() {
 
         graph[idx].push([graph[idx].length, score]);
     });
-    $("#charts").empty();
-    $("#charts").append($("<div id='chart'>"));
-    $.jqplot('chart', graph, getGraphOptions());
-    var t = +new Date();
-    var play = {ts: t, game: game, tricks: tricks}
-    localStorage.setItem('game.' + t, JSON.stringify(play));
+    var play = {game: game.name, tricks: tricks, players: currentplayers};
+    gameprogress['games'].push(play)
+    saveGame();
     return true;
 
 };
 
-$(document).ready(function() {
+var drawGraph = function(){
+    $("#charts").empty();
+    $("#charts").append($("<div id='chart'>"));
+    $.jqplot('chart', graph, getGraphOptions());
+}
 
+var getKey = function(name){
+    var key = 'currentgame';
+    if (name)
+        key = 'game.' + name;
+    return key;
+}
+
+var saveGame = function(name) {
+    var key = getKey(name); 
+    localStorage.setItem(key, JSON.stringify(gameprogress));
+}
+
+var loadGame = function(name) {
+    var key = getKey(name);
+    var oldgame = JSON.parse(localStorage.getItem(key));
+    $.each(oldgame.games, function(idx, game) {
+        var gametype = games[game.game];
+        addScore(gametype, game.tricks, game.players);
+
+    });
+    var myplayers = $('.name');
+    $.each(oldgame.players, function(idx, player) {
+        $(myplayers[idx]).html(player);
+    });
+    drawGraph();
+}
+
+var submitGame = function() {
+    var allplayers = $(".name");
+    var currentplayers = [];
+    $.each($('.name.playing'), function(idx, player) {
+        currentplayers.push(allplayers.index(player));
+        
+    });
+    var game = getSelectedGame();
+    var tricks = getTricks();
+    if (addScore(game, tricks, currentplayers)){
+        drawGraph();
+        $("#tricks").val('');
+        $(".playing").removeClass('playing');
+        $('#dbl').attr('checked', false);
+    }
+
+}
+
+
+var initVars = function() {
+    var players = [];
+    $.each($('.name'), function(idx, name) {
+        players.push($(name).html());
+    });
+    gameprogress = {players: players, games: []};
+    $('.score').html('0');
+    graph = [[[0, 0]], [[0, 0]], [[0, 0]], [[0, 0]]];
+};
+
+$(document).ready(function() {
+    initVars();
     //name change
     $('.name').dblclick(function() {
-        var newname = prompt("Enter new name:", this.innerHTML)
+        $this = $(this);
+        var newname = prompt("Enter new name:", $this.html())
         if (newname != null)
-            this.innerHTML = newname;
-    } );
+            $this.html(newname);
+        gameprogress.players[$('.name').index($this)] = newname;
+        drawGraph();
+    });
     //player select
     $('.name').click(function() {
         var gametype = getSelectedGame();
 
         $this = $(this)
         $this.toggleClass("playing");
-    } );
+    });
+    $("#submit").click(submitGame);
+    $("#undo").click(function() {
+        gameprogress.games.pop();
+        localStorage.setItem('currentgame', JSON.stringify(gameprogress));
+        $('.score').html('0');
+        initVars();
+        loadGame();
+
+    });
     $('#tricks').keydown(function (ev) {
         console.log(ev.keyCode);
         if ((ev.keyCode >= 48 && ev.keyCode <= 57) || ev.keyCode == 8 || ev.keyCode == 9 || ev.keyCode == 17 || ev.keyCode >= 96 && ev.keyCode <= 105){
             return true;
         }
         if (ev.keyCode == 13){
-            if (addScore()){
-                $("#tricks").val('');
-                $(".playing").removeClass('playing');
-                $('#dbl').attr('checked', false);
-            }
+            submitGame();
         }
         return false;
     });
+
+    if(localStorage.hasOwnProperty('currentgame')){
+        if (confirm('Do you want to resume previous game?')) loadGame();
+    }
 
     $.jqplot('chart', graph, getGraphOptions());
 });
