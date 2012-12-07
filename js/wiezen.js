@@ -111,8 +111,9 @@ $(document).ready(function() {
 
     //name change
     $('.name').dblclick(function() {
-        var newname = prompt("Enter new name:")
-        this.innerHTML = newname;
+        var newname = prompt("Enter new name:", this.innerHTML)
+        if (newname != null)
+            this.innerHTML = newname;
     } );
     //player select
     $('.name').click(function() {
@@ -123,7 +124,7 @@ $(document).ready(function() {
     } );
     $('#tricks').keydown(function (ev) {
         console.log(ev.keyCode);
-        if ((ev.keyCode >= 48 && ev.keyCode <= 57) || ev.keyCode == 8 || ev.keyCode == 9 || ev.keyCode == 17){
+        if ((ev.keyCode >= 48 && ev.keyCode <= 57) || ev.keyCode == 8 || ev.keyCode == 9 || ev.keyCode == 17 || ev.keyCode >= 96 && ev.keyCode <= 105){
             return true;
         }
         if (ev.keyCode == 13){
