@@ -3,7 +3,14 @@ var gameprogress = null;
 
 var getGraphOptions = function () {
     var maxtick = graph[0].length;
-    var options = {axes: { xaxis: {min: 0, max: maxtick, numberTicks: maxtick+1}},
+    var options = {axes: { xaxis: {min: 0, 
+                                   max: maxtick,
+                                   numberTicks: maxtick+1,}
+                         },
+                   seriesDefaults: { 
+                       showMarker:false,
+                       pointLabels: { show:true }},
+                   axes:{ yaxis:{ pad: 1.3 } },
                    legend: { show: true}};
     var series = [];
     $.each($('.name'), function(idx, val){
@@ -85,6 +92,7 @@ var addScore = function(game, tricks, currentplayers) {
     }
     //TODO: think of triplie miserie
     var alone = amount == 2 ? 1: 3;
+    var play = {game: game.name, tricks: tricks, players: currentplayers};
     $.each($('.name'), function(idx, val){
         var score = parseInt(scores[idx].innerHTML);
         if(currentplayers.indexOf(idx) != -1){
@@ -95,9 +103,8 @@ var addScore = function(game, tricks, currentplayers) {
         }
         scores[idx].innerHTML = score;
 
-        graph[idx].push([graph[idx].length, score]);
+        graph[idx].push([graph[idx].length, score, play ]);
     });
-    var play = {game: game.name, tricks: tricks, players: currentplayers};
     gameprogress['games'].push(play)
     saveGame();
     return true;
@@ -123,6 +130,7 @@ var saveGame = function(name) {
 }
 
 var loadGame = function(name) {
+    initVars();
     var key = getKey(name);
     var oldgame = JSON.parse(localStorage.getItem(key));
     $.each(oldgame.games, function(idx, game) {
@@ -169,6 +177,35 @@ var initVars = function() {
 $(document).ready(function() {
     initVars();
     //name change
+
+    $('.jqplot-point-label').live('hover', function(ev) {
+        $this = $(this);
+        if (! $this.data('nr'))
+            $this.data('nr', $this.html());
+        if (ev.type == 'mouseenter'){
+            var classes = $this.attr('class').split(' ');
+            var serieid = classes[1].split('-')[2];
+            var pointid = classes[2].split('-')[2];
+            var game = graph[serieid][pointid][2];
+            var players = [];
+            $.each(game.players, function(_, idx) {
+                players.push(gameprogress.players[idx]);
+            });
+            var deletelink = $("<a style='cursor: pointer;'>").html("Delete").click(function(){
+                gameprogress.games.splice(pointid -1, 1);
+                localStorage.setItem('currentgame', JSON.stringify(gameprogress));
+                $('.score').html('0');
+                initVars();
+                loadGame();
+            });
+            var gameinfo = $("<div>").append("Payer(s) " + players.join(', ') + "<br/>Played " +  game.game + "<br/> and made " + game.tricks + " tricks.<br/>");
+            gameinfo.append(deletelink);
+            var data = $('<div class="jqplot-highlighter-tooltip" style="font-size: 14px;">').html(gameinfo);
+            $this.html(data);
+        }
+        else
+            $this.html($this.data('nr'));
+    });
     $('.name').dblclick(function() {
         $this = $(this);
         var newname = prompt("Enter new name:", $this.html())
