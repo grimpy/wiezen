@@ -1,8 +1,45 @@
 body            { font-family: sans-serif; background: #eee; }
-.playing        { color: #00f; }
-.games          { float: left; }
-.scores         { float: left; }
-.tricks         { clear:both; float: left; }
-input           { text-align: right; width: 50px;}
+.playing        { font-weight: bold; color: green;}
+.tblgrid        { float: left; 
+                  border-style: solid; 
+                  border-width: thin; 
+                  padding: 10px; 
+                  margin-left: 10px;
+                  border-radius: 20px; 
+                  box-shadow: 6px 6px 3px #888888;}
+
+.tricks         { clear:both; 
+                  float: left; 
+                  border-style: solid; 
+                  border-width: thin; 
+                  padding: 5px; 
+                  box-shadow: 6px 6px 3px #888888;}
+
+input           { text-align: right; 
+                  width: 50px;
+                  background-color: transparent;
+                  border-style: solid;
+                  border-width: 0px 0px 1px 0px;
+                  border-color: darkred;}
+
+input.radio     { margin:0 20px; 
+                  background-color: transparent;}
 .score          { text-align: right; }
 .name           { cursor: pointer; }
+.clr            { clear:both; height: 20px; }
+.gradients{ 
+                  background-image: linear-gradient(right bottom, rgb(204,204,204) 22%, rgb(221,221,221) 57%, rgb(238,238,238) 80%);
+                  background-image: -o-linear-gradient(right bottom, rgb(204,204,204) 22%, rgb(221,221,221) 57%, rgb(238,238,238) 80%);
+                  background-image: -moz-linear-gradient(right bottom, rgb(204,204,204) 22%, rgb(221,221,221) 57%, rgb(238,238,238) 80%);
+                  background-image: -webkit-linear-gradient(right bottom, rgb(204,204,204) 22%, rgb(221,221,221) 57%, rgb(238,238,238) 80%);
+                  background-image: -ms-linear-gradient(right bottom, rgb(204,204,204) 22%, rgb(221,221,221) 57%, rgb(238,238,238) 80%);
+
+                  background-image: -webkit-gradient(
+                                     linear,
+                                     right bottom,
+                                     left top,
+                                     color-stop(0.22, rgb(204,204,204)),
+                                     color-stop(0.57, rgb(221,221,221)),
+                                     color-stop(0.8, rgb(238,238,238))
+                                    );
+}
