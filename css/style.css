@@ -15,7 +15,7 @@ body            { font-family: sans-serif; background: #eee; }
                   padding: 5px; 
                   box-shadow: 6px 6px 3px #888888;}
 
-input           { text-align: right; 
+#tricks           { text-align: right; 
                   width: 50px;
                   background-color: transparent;
                   border-style: solid;

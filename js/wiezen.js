@@ -208,11 +208,26 @@ $(document).ready(function() {
     });
     $('.name').dblclick(function() {
         $this = $(this);
-        var newname = prompt("Enter new name:", $this.html())
-        if (newname != null)
-            $this.html(newname);
-        gameprogress.players[$('.name').index($this)] = newname;
-        drawGraph();
+        var oldname = $this.html();
+        var inp = $("<input>");
+        inp.val(oldname);
+        $this.html(inp);
+        inp.select();
+        inp.keyup(function (ev) {
+            switch(ev.keyCode){
+                case 13: {
+                    $this.html(inp.val());
+                    gameprogress.players[$('.name').index($this)] = $this.html();
+                    drawGraph();
+                    break;
+                }
+                case 27: {
+                    $this.html(oldname);
+                    break;
+                }
+            }
+            return true
+        });
     });
     //player select
     $('.name').click(function() {
