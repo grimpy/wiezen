@@ -1,5 +1,7 @@
 var graph = null;
 var gameprogress = null;
+var inputtype = "";
+var inputgamenum = -1;
 
 var getGraphOptions = function () {
     var maxtick = graph[0].length;
@@ -81,8 +83,8 @@ var isDouble = function() {
 }
 
 
-var addScore = function(game, tricks, currentplayers) {
-    var multiplier = isDouble() ? 2: 1;
+var addScore = function(game, tricks, currentplayers, dbl) {
+    var multiplier = dbl ? 2: 1;
     var basescore = game.getBaseScore(tricks, multiplier);
     var scores = $(".score");
     var amount = currentplayers.length;
@@ -92,7 +94,7 @@ var addScore = function(game, tricks, currentplayers) {
     }
     //TODO: think of triplie miserie
     var alone = amount == 2 ? 1: 3;
-    var play = {game: game.name, tricks: tricks, players: currentplayers};
+    var play = {game: game.name, tricks: tricks, players: currentplayers, dbl: dbl};
     $.each($('.name'), function(idx, val){
         var score = parseInt(scores[idx].innerHTML);
         if(currentplayers.indexOf(idx) != -1){
@@ -105,8 +107,17 @@ var addScore = function(game, tricks, currentplayers) {
 
         graph[idx].push([graph[idx].length, score, play ]);
     });
-    gameprogress['games'].push(play)
-    saveGame();
+        if(inputtype != 'replace') {
+            gameprogress['games'].push(play)
+            saveGame();
+        }
+        else {
+            gameprogress.games.splice(inputgamenum, 1, play);
+            inputtype='';
+            inputgamenum=-1;
+            $('#submit').html('Enter');	
+            reInitialize();
+        }
     return true;
 
 };
@@ -135,7 +146,7 @@ var loadGame = function(name) {
     var oldgame = JSON.parse(localStorage.getItem(key));
     $.each(oldgame.games, function(idx, game) {
         var gametype = games[game.game];
-        addScore(gametype, game.tricks, game.players);
+        addScore(gametype, game.tricks, game.players, game.dbl);
 
     });
     var myplayers = $('.name');
@@ -154,13 +165,21 @@ var submitGame = function() {
     });
     var game = getSelectedGame();
     var tricks = getTricks();
-    if (addScore(game, tricks, currentplayers)){
+    var dbl = isDouble();
+    if (addScore(game, tricks, currentplayers, dbl)){
         drawGraph();
         $("#tricks").val('');
         $(".playing").removeClass('playing');
         $('#dbl').attr('checked', false);
     }
 
+}
+
+var reInitialize = function() {
+    localStorage.setItem('currentgame', JSON.stringify(gameprogress));
+    $('.score').html('0');
+    initVars();
+    loadGame();
 }
 
 
@@ -176,8 +195,8 @@ var initVars = function() {
 
 $(document).ready(function() {
     initVars();
-    //name change
 
+    // hover game in history
     $('.jqplot-point-label').live('hover', function(ev) {
         $this = $(this);
         if (! $this.data('nr'))
@@ -193,57 +212,74 @@ $(document).ready(function() {
             });
             var deletelink = $("<a style='cursor: pointer;'>").html("Delete").click(function(){
                 gameprogress.games.splice(pointid -1, 1);
-                localStorage.setItem('currentgame', JSON.stringify(gameprogress));
-                $('.score').html('0');
-                initVars();
-                loadGame();
+                reInitialize();
             });
-            var gameinfo = $("<div>").append("Payer(s) " + players.join(', ') + "<br/>Played " +  game.game + "<br/> and made " + game.tricks + " tricks.<br/>");
+            var replacelink = $("<a style='cursor: pointer;'>").html("Replace").click(function(){
+                    inputtype = 'replace';
+                    inputgamenum = pointid -1;
+                    $('#submit').html('Replace');
+                    oldgame = gameprogress.games[inputgamenum];
+                    $('#tricks').val(oldgame.tricks);
+                    $(".playing").removeClass('playing');
+                    names = $('.name');
+                    for(i=0;i<players.length;i++){
+                        for(j=0;j<names.length;j++){
+                            if(names[j].innerHTML==players[i]){
+                                $this = $(names[j]);
+                                $this.toggleClass("playing");
+                            }
+                        }
+                    }
+                    $('#'+oldgame.game).click();
+                    $('#dbl').attr('checked', oldgame.dbl ? true : false);
+            });
+            var gameinfo = $("<div>").append("Payer(s) " + players.join(', ') + "<br/>Played " + (game.dbl ? ' <b>double</b> ' : '') +  game.game + "<br/> and made " + game.tricks + " tricks.<br/>");
             gameinfo.append(deletelink);
+            gameinfo.append("&nbsp;");
+            gameinfo.append(replacelink);
             var data = $('<div class="jqplot-highlighter-tooltip" style="font-size: 14px;">').html(gameinfo);
             $this.html(data);
         }
         else
             $this.html($this.data('nr'));
     });
+    
+    //name change
     $('.name').dblclick(function() {
         $this = $(this);
         var oldname = $this.html();
-        var inp = $("<input>");
-        inp.val(oldname);
-        $this.html(inp);
-        inp.select();
-        inp.keyup(function (ev) {
-            switch(ev.keyCode){
-                case 13: {
-                    $this.html(inp.val());
-                    gameprogress.players[$('.name').index($this)] = $this.html();
-                    drawGraph();
-                    break;
+        if (oldname.substring(0,1) != "<") {
+            var inp = $("<input class='inpbox'>");
+            inp.val(oldname);
+            $this.html(inp);
+            inp.select();
+            inp.keyup(function (ev) {
+                switch(ev.keyCode){
+                    case 13: {
+                        $this.html(inp.val());
+                        gameprogress.players[$('.name').index($this)] = $this.html();
+                        drawGraph();
+                        break;
+                    }
+                    case 27: {
+                        $this.html(oldname);
+                        break;
+                    }
                 }
-                case 27: {
-                    $this.html(oldname);
-                    break;
-                }
-            }
-            return true
-        });
+                return true
+            });
+        }
     });
     //player select
     $('.name').click(function() {
         var gametype = getSelectedGame();
-
         $this = $(this)
         $this.toggleClass("playing");
     });
     $("#submit").click(submitGame);
     $("#undo").click(function() {
         gameprogress.games.pop();
-        localStorage.setItem('currentgame', JSON.stringify(gameprogress));
-        $('.score').html('0');
-        initVars();
-        loadGame();
-
+        reInitialize();
     });
     $('#tricks').keydown(function (ev) {
         console.log(ev.keyCode);
