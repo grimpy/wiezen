@@ -112,7 +112,7 @@ var addScore = function(game, tricks, currentplayers, dbl) {
             saveGame();
         }
         else {
-            gameprogress.games.splice(inputgamenum, 1, play);
+            gameprogress.games[inputgamenum] = play;
             inputtype='';
             inputgamenum=-1;
             $('#submit').html('Enter');	
@@ -218,20 +218,14 @@ $(document).ready(function() {
                     inputtype = 'replace';
                     inputgamenum = pointid -1;
                     $('#submit').html('Replace');
-                    oldgame = gameprogress.games[inputgamenum];
-                    $('#tricks').val(oldgame.tricks);
+                    $('#tricks').val(game.tricks);
                     $(".playing").removeClass('playing');
-                    names = $('.name');
-                    for(i=0;i<players.length;i++){
-                        for(j=0;j<names.length;j++){
-                            if(names[j].innerHTML==players[i]){
-                                $this = $(names[j]);
-                                $this.toggleClass("playing");
-                            }
-                        }
-                    }
-                    $('#'+oldgame.game).click();
-                    $('#dbl').attr('checked', oldgame.dbl ? true : false);
+                    var names = $('.name');
+                    $.each(game.players, function(ndx, idx) {
+                        $(names[idx]).toggleClass("playing");
+                    });
+                    $('#'+game.game).click();
+                    $('#dbl').attr('checked', game.dbl ? true : false);
             });
             var gameinfo = $("<div>").append("Payer(s) " + players.join(', ') + "<br/>Played " + (game.dbl ? ' <b>double</b> ' : '') +  game.game + "<br/> and made " + game.tricks + " tricks.<br/>");
             gameinfo.append(deletelink);
