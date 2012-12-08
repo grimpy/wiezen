@@ -277,7 +277,11 @@ $(document).ready(function() {
     });
     $('#tricks').keydown(function (ev) {
         console.log(ev.keyCode);
-        if ((ev.keyCode >= 48 && ev.keyCode <= 57) || ev.keyCode == 8 || ev.keyCode == 9 || ev.keyCode == 17 || ev.keyCode >= 96 && ev.keyCode <= 105){
+        if ((ev.keyCode >= 48 && ev.keyCode <= 57) || //number codes
+             [8, 9, 17, 46].indexOf(ev.keyCode) != -1 || //backspace, tab, ctrl and delete
+             (ev.keyCode >= 96 && ev.keyCode <= 105) || //numeric keys
+             (ev.keyCode >= 37 && ev.keyCode <= 40) //arrow keys
+             ){
             return true;
         }
         if (ev.keyCode == 13){
