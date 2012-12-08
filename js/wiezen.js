@@ -157,6 +157,7 @@ var loadGame = function(name) {
 }
 
 var submitGame = function() {
+    if ($('.name > input').length != 0) return false;
     var allplayers = $(".name");
     var currentplayers = [];
     $.each($('.name.playing'), function(idx, player) {
@@ -240,6 +241,7 @@ $(document).ready(function() {
     
     //name change
     $('.name').dblclick(function() {
+        $("#submit").attr("disabled", "disabled");
         $this = $(this);
         var oldname = $this.html();
         if (oldname.substring(0,1) != "<") {
@@ -260,6 +262,8 @@ $(document).ready(function() {
                         break;
                     }
                 }
+
+                $("#submit").removeAttr("disabled");
                 return true
             });
         }
@@ -277,7 +281,11 @@ $(document).ready(function() {
     });
     $('#tricks').keydown(function (ev) {
         console.log(ev.keyCode);
-        if ((ev.keyCode >= 48 && ev.keyCode <= 57) || ev.keyCode == 8 || ev.keyCode == 9 || ev.keyCode == 17 || ev.keyCode >= 96 && ev.keyCode <= 105){
+        if ((ev.keyCode >= 48 && ev.keyCode <= 57) || //number codes
+             [8, 9, 17, 46].indexOf(ev.keyCode) != -1 || //backspace, tab, ctrl and delete
+             (ev.keyCode >= 96 && ev.keyCode <= 105) || //numeric keys
+             (ev.keyCode >= 35 && ev.keyCode <= 40) //arrow keys, home and end
+             ){
             return true;
         }
         if (ev.keyCode == 13){
