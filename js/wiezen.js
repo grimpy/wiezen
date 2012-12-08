@@ -280,7 +280,7 @@ $(document).ready(function() {
         if ((ev.keyCode >= 48 && ev.keyCode <= 57) || //number codes
              [8, 9, 17, 46].indexOf(ev.keyCode) != -1 || //backspace, tab, ctrl and delete
              (ev.keyCode >= 96 && ev.keyCode <= 105) || //numeric keys
-             (ev.keyCode >= 37 && ev.keyCode <= 40) //arrow keys
+             (ev.keyCode >= 35 && ev.keyCode <= 40) //arrow keys, home and end
              ){
             return true;
         }
