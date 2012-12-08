@@ -157,6 +157,7 @@ var loadGame = function(name) {
 }
 
 var submitGame = function() {
+    if ($('.name > input').length != 0) return false;
     var allplayers = $(".name");
     var currentplayers = [];
     $.each($('.name.playing'), function(idx, player) {
@@ -240,6 +241,7 @@ $(document).ready(function() {
     
     //name change
     $('.name').dblclick(function() {
+        $("#submit").attr("disabled", "disabled");
         $this = $(this);
         var oldname = $this.html();
         if (oldname.substring(0,1) != "<") {
@@ -260,6 +262,8 @@ $(document).ready(function() {
                         break;
                     }
                 }
+
+                $("#submit").removeAttr("disabled");
                 return true
             });
         }
