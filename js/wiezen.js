@@ -291,6 +291,18 @@ $(document).ready(function() {
         if (ev.keyCode == 13){
             submitGame();
         }
+        if (ev.keyCode == 27){
+            inputtype = "";
+            inputgamenum = -1;
+            $('#submit').html('Enter');
+            $(".playing").removeClass('playing');
+            $('#dbl').attr('checked', false);
+            $('#alone').click();
+            $('#tricks').val('');
+            $('#submit').focus();
+            $('#tricks').focus();
+            
+        }
         return false;
     });
 
