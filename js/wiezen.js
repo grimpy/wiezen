@@ -1,7 +1,6 @@
 var graph = null;
 var gameprogress = null;
-var inputtype = "";
-var inputgamenum = -1;
+var editgamenum = -1;
 
 var getGraphOptions = function () {
     var maxtick = graph[0].length;
@@ -107,14 +106,13 @@ var addScore = function(game, tricks, currentplayers, dbl) {
 
         graph[idx].push([graph[idx].length, score, play ]);
     });
-        if(inputtype != 'replace') {
+        if($('#submit').html() != 'Edit') {
             gameprogress['games'].push(play)
             saveGame();
         }
         else {
-            gameprogress.games[inputgamenum] = play;
-            inputtype='';
-            inputgamenum=-1;
+            gameprogress.games[editgamenum] = play;
+            editgamenum=-1;
             $('#submit').html('Enter');	
             reInitialize();
         }
@@ -215,10 +213,9 @@ $(document).ready(function() {
                 gameprogress.games.splice(pointid -1, 1);
                 reInitialize();
             });
-            var replacelink = $("<a style='cursor: pointer;'>").html("Replace").click(function(){
-                    inputtype = 'replace';
-                    inputgamenum = pointid -1;
-                    $('#submit').html('Replace');
+            var replacelink = $("<a style='cursor: pointer;'>").html("Edit").click(function(){
+                    editgamenum = pointid -1;
+                    $('#submit').html('Edit');
                     $('#tricks').val(game.tricks);
                     $(".playing").removeClass('playing');
                     var names = $('.name');
@@ -290,6 +287,17 @@ $(document).ready(function() {
         }
         if (ev.keyCode == 13){
             submitGame();
+        }
+        if (ev.keyCode == 27){
+            editgamenum = -1;
+            $('#submit').html('Enter');
+            $(".playing").removeClass('playing');
+            $('#dbl').attr('checked', false);
+            $('#alone').click();
+            $('#tricks').val('');
+            $('#submit').focus();
+            $('#tricks').focus();
+            
         }
         return false;
     });
